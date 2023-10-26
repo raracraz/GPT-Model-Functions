@@ -13,7 +13,7 @@ def autoComplete(stock_name):
     querystring = {"q":stock_name}
 
     headers = {
-        "X-RapidAPI-Key": "a7ec869789mshfb612d70114af5bp1504acjsn781fc1c89727",
+        "X-RapidAPI-Key": rapidapi_api_key,
         "X-RapidAPI-Host": "morning-star.p.rapidapi.com"
     }
 
