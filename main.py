@@ -3,7 +3,7 @@ import json
 import sys
 import configparser
 import os
-# import the getNews function from Finance/getNews.py
+
 from Function_List.Finance.getFinanceNews import get_finance_news
 
 # Load the config file
