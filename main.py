@@ -174,9 +174,6 @@ def get_gpt_response(prompt):
             return second_response
         
 
-
-
-
 def main():
     load_api_key()
     prompt = "get me the latest news for Tesla"
