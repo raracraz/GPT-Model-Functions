@@ -1,2 +1,5 @@
 How to Print ChatGPT API Response Output as a Stream: An Example in Python: https://www.youtube.com/watch?v=cu7h8gkEtvk
 GPT Function Calling: Absolute Game Changer: https://www.youtube.com/watch?v=qNISzZoqpI0
+GPT function calling in a nutshell: https://www.youtube.com/watch?v=i-oHvHejdsc
+
+Sign up for RapidAPI: https://rapidapi.com/developer/dashboard
