@@ -177,7 +177,12 @@ def main():
     prompt = "who is the president of the united states in 2004?"
     response = get_gpt_response(prompt)
     print(response)
-
+    
+    # delete all .pyc files in the directory and subdirectories and __pycache__ folders
+    import glob
+    import shutil
+    for pyc_folder in glob.glob("**/__pycache__", recursive=True):
+        shutil.rmtree(pyc_folder)
 
 if __name__ == "__main__":
     main()
