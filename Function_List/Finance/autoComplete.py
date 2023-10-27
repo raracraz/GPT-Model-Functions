@@ -19,7 +19,5 @@ def autoComplete(stock_name):
     }
 
     response = requests.get(url, headers=headers, params=querystring)
+    
     return(json.dumps(response.json(), indent=4))
-
-if __name__ == "__main__":
-    autoComplete("Tesla Inc")

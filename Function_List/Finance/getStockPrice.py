@@ -1,19 +1,20 @@
 import requests
 import configparser
+import json
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 
 rapidapi_api_key = config["rapidapi"]["rapidapi_api_key"]
 
-def getStockPrice(performance_id):
+def getStockPrice(performanceId):
     # if there is no performance id, use the default one
     # if not performance_id:
     #     performance_id = "0P0000OQN8"
     
     url = "https://morning-star.p.rapidapi.com/stock/v2/get-realtime-data"
     
-    querystring = {"performanceId": performance_id}
+    querystring = {"performanceId": performanceId}
 
     headers = {
         "X-RapidAPI-Key": rapidapi_api_key,
@@ -21,5 +22,5 @@ def getStockPrice(performance_id):
     }
 
     response = requests.get(url, headers=headers, params=querystring)
-
-    print(response.json())
+    
+    return(json.dumps(response.json(), indent=4))
