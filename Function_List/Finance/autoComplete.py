@@ -1,5 +1,6 @@
 import requests
 import configparser
+import json
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -18,7 +19,7 @@ def autoComplete(stock_name):
     }
 
     response = requests.get(url, headers=headers, params=querystring)
-    
-    # only return the first performance id
-    # return response.json()["result"][0]["performanceId"]
-    return(response.json()["results"][0]["performanceId"])
+    return(json.dumps(response.json(), indent=4))
+
+if __name__ == "__main__":
+    autoComplete("Tesla Inc")

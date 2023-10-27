@@ -12,7 +12,6 @@ def getFinanceNews(performanceId):
     # if there is no performance id, use the default one
 	if not performanceId:
 		performanceId = "0P0000OQN8"
-	print(performanceId)
     
 	url = "https://morning-star.p.rapidapi.com/articles/list"
 	querystring = {"performanceId": performanceId}
@@ -21,9 +20,11 @@ def getFinanceNews(performanceId):
 		"X-RapidAPI-Host": "morning-star.p.rapidapi.com"
 	}
 	response = requests.get(url, headers=headers, params=querystring)
-	print(response)
 
-	return json.dumps(response)
+	with open("response.json", "w") as f:
+		f.write(json.dumps(response.json(), indent=4))
+  
+	return(json.dumps(response.json(), indent=4))
 
 if __name__ == "__main__":
 	getFinanceNews("0P0000OQN8")
