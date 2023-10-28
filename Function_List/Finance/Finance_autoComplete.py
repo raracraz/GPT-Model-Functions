@@ -7,7 +7,7 @@ config.read("config.ini")
 
 rapidapi_api_key = config["rapidapi"]["rapidapi_api_key"]
 
-def autoComplete(stock_name):
+def Finance_autoComplete(stock_name):
 
     url = "https://morning-star.p.rapidapi.com/market/v2/auto-complete"
 
