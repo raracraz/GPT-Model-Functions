@@ -6,6 +6,11 @@ from Function_List.Weather.Weather_autoComplete import Weather_autoComplete
 from Function_List.Weather.getRealtimeWeather import getRealtimeWeather
 from Function_List.Weather.getForecastWeather import getForecastWeather
 
+from Function_List.Translation.Translation_detectLang import Translation_detectLang
+from Function_List.Translation.Translation_translateLang import Translation_translateLang
+
+from Function_List.Internet.Internet_googleSearch import Internet_googleSearch
+
 import openai
 import json
 import sys
@@ -163,6 +168,51 @@ def get_gpt_response(prompt, messages=None):
             },
             required=["lat", "long", "days"],
         ),
+        generate_function_template(
+            "Translation_detectLang",
+            "Detects the language of a given text.",
+            parameters={
+                "text": {
+                    "type": "string",
+                    "description": "The text to detect the language.",
+                }
+            },
+            required=["text"],
+        ),
+        generate_function_template(
+            "Translation_translateLang",
+            "Translates a given text to a given language.",
+            parameters={
+                "text": {
+                    "type": "string",
+                    "description": "The text to translate.",
+                },
+                "target_lang": {
+                    "type": "string",
+                    "description": "The language to translate the text to.",
+                },
+                "source_lang": {
+                    "type": "string",
+                    "description": "The language of the text. If not specified, the language will be automatically detected.",
+                },
+            },
+            required=["text", "target_lang"],
+        ),
+        generate_function_template(
+            "Internet_googleSearch",
+            "Searches Google for a given query and returns the top 100 results. You should use this function to search for information on the Internet if the user asks a question about current events, history, or other general knowledge after July 5th 2022",
+            parameters={
+                "query": {
+                    "type": "string",
+                    "description": "The query to search.",
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "The number of results to return. Default number of limit is 100, unless user specifies a different number.",
+                },
+            },
+            required=["query, limit"],
+        ),
     ]
 
     response = openai.ChatCompletion.create(
@@ -189,6 +239,13 @@ def get_gpt_response(prompt, messages=None):
             "Weather_autoComplete": Weather_autoComplete,
             "getRealtimeWeather": getRealtimeWeather,
             "getForecastWeather": getForecastWeather,
+            
+            # Translation
+            "Translation_detectLang": Translation_detectLang,
+            "Translation_translateLang": Translation_translateLang,
+            
+            # Internet
+            "Internet_googleSearch": Internet_googleSearch,
             
         }  # only one function in this example, but you can have multiple
         function_name = response_message["function_call"]["name"]
@@ -227,7 +284,7 @@ def get_gpt_response(prompt, messages=None):
 
 def main():
     load_api_key()
-    prompt = "what is the weather in thailand, bangkok?"
+    prompt = "what is today's date?"
     response = get_gpt_response(prompt)
     print(response)
     
