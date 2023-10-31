@@ -15,6 +15,8 @@ import openai
 import json
 import sys
 import configparser
+import threading
+import queue as Queue
 
 # Load the config file
 config = configparser.ConfigParser()
@@ -24,7 +26,6 @@ gpt_model = config["openai"]["gpt_model"]
 
 # Import the functions
 
-
 def load_api_key():
     try:
         openai.api_key = config["openai"]["openai_api_key"]
@@ -33,7 +34,6 @@ def load_api_key():
         print("Error: Failed to load the API key.")
         print(f"Exception: {e}")
         sys.exit(1)
-
 
 def generate_message_template(role, content):
     """
@@ -200,15 +200,24 @@ def get_gpt_response(prompt, messages=None):
         ),
         generate_function_template(
             "Internet_googleSearch",
-            "Searches Google for a given query and returns the top 100 results. You should use this function to search for information on the Internet if the user asks a question about current events, history, or other general knowledge after July 5th 2022",
+            """
+            This function searches Google for a specific query and returns the top 100 results. It is essential when seeking information about current events, historical events, or other general knowledge topics.
+            
+            Use Cases:
+            - For inquiries related to specific events or topics after July 5th, 2022, as the built-in knowledge of the assistant may not have the latest information beyond this date.
+            - For comprehensive research on topics, as the function provides a wide range of top search results.
+            - For accessing the most recent updates on current events or evolving situations.
+            
+            Note: It is recommended to utilize this function especially when the user asks questions about events or knowledge post-July 5th, 2022, to ensure the most up-to-date and accurate information is provided.
+            """,
             parameters={
                 "query": {
                     "type": "string",
-                    "description": "The query to search.",
+                    "description": "The specific query or topic to search on Google.",
                 },
                 "limit": {
                     "type": "integer",
-                    "description": "The number of results to return. Default number of limit is 100, unless user specifies a different number.",
+                    "description": "The number of results to retrieve. By default, it returns the top 100 results, but users can specify a different number if needed.",
                 },
             },
             required=["query, limit"],
@@ -284,7 +293,7 @@ def get_gpt_response(prompt, messages=None):
 
 def main():
     load_api_key()
-    prompt = "what is today's date?"
+    prompt = "get me the coordinates for Singapore, clementi"
     response = get_gpt_response(prompt)
     print(response)
     
