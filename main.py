@@ -11,12 +11,12 @@ from Function_List.Translation.Translation_translateLang import Translation_tran
 
 from Function_List.Internet.Internet_googleSearch import Internet_googleSearch
 
+
+
 import openai
 import json
 import sys
 import configparser
-import threading
-import queue as Queue
 
 # Load the config file
 config = configparser.ConfigParser()
@@ -27,6 +27,15 @@ gpt_model = config["openai"]["gpt_model"]
 # Import the functions
 
 def load_api_key():
+    """
+    Loads the OpenAI API key from the config file.
+    
+    Parameters:
+    - None
+    
+    Returns:
+    - None
+    """
     try:
         openai.api_key = config["openai"]["openai_api_key"]
         print("Successfully loaded the API key.")
@@ -84,6 +93,16 @@ def generate_function_template(name, description, parameters=None, required=None
 
 
 def get_gpt_response(prompt, messages=None):
+    """
+    This function takes in a prompt and returns the response from GPT-3.5
+    
+    Parameters:
+    - prompt (str): The prompt to feed into the GPT model
+    - messages (list, optional): A list of messages to feed into the GPT model
+    
+    Returns:
+    - JSON: A JSON object representing the response from GPT-3.5
+    """
     # messages = [generate_message_template("user", prompt)]
     if messages is None:
         messages = [generate_message_template("user", prompt)]
@@ -293,9 +312,15 @@ def get_gpt_response(prompt, messages=None):
 
 def main():
     load_api_key()
-    prompt = "get me the coordinates for Singapore, clementi"
+    # use Internet prompt
+    internet_prompt = "use the Internet_googleSearch function to complete this request: "
+    prompt = "what is the base price of shipping from US to SG using DHL for a 0.5kg package?"
+    prompt = internet_prompt + prompt
+    
     response = get_gpt_response(prompt)
-    print(response)
+    
+    response = json.loads(response)
+    print(response["content"])
     
     # delete all .pyc files in the directory and subdirectories and __pycache__ folders
     import glob
