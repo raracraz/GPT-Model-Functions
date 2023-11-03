@@ -8,6 +8,6 @@ main.py: The main script that integrates with the OpenAI API. It contains functi
 This repository is currently a work in progress. More functionalities and improvements will be added over time.
 
 ## Improvement Ideas
-[✔️] Add Session Management
+[✔] Add Session Management
 [ ] Add a GUI (app/website)
 [ ] Add a database to store user data (if needed)
