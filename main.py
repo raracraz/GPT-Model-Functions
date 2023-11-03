@@ -337,23 +337,29 @@ def main(session_uuid=None):
     internet_prompt = (
         "use the Internet_googleSearch function to complete this request: "
     )
-    prompt = "what is the base price of shipping from US to SG using DHL for a 0.5kg package?"
+    prompt = "how about for buyandship.com.sg?"
     prompt = internet_prompt + prompt
     
     # append the context to the prompt
-    prompt = f"{prompt}\n\nContext: {context}"
+    prompt = f"Prompt: {prompt}\n\nPrevious Conversation Context: {context}"
     
     response = get_gpt_response(prompt)
 
     response = json.loads(response)
+    print(response["content"])
     
-    # output the response to the session_uuid.json file
-    context = response["context"]
+    # append the response to the session_uuid.json file
+    # Determine the next context number
+    next_context_num = len(context) + 1
+    context_key = f"context{next_context_num}"
+
+    # Append the response to the context
+    context[context_key] = response["content"]
+
+    # Write the updated context back to the session_uuid.json file
     with open(f"sessions/{session_uuid}.json", "w") as f:
         json.dump(context, f, indent=4)
-
-    print(response["content"])
-
+        
     # delete all .pyc files in the directory and subdirectories and __pycache__ folders
     import glob
     import shutil
@@ -361,7 +367,6 @@ def main(session_uuid=None):
     for pyc_folder in glob.glob("**/__pycache__", recursive=True):
         shutil.rmtree(pyc_folder)
 
-
 if __name__ == "__main__":
-    session_uuid = ""
+    session_uuid = "f35ef53d-8c0e-4e46-adf3-e56349a5e6fa"
     main(session_uuid)
