@@ -11,12 +11,12 @@ from Function_List.Translation.Translation_translateLang import Translation_tran
 
 from Function_List.Internet.Internet_googleSearch import Internet_googleSearch
 
-
-
 import openai
 import json
 import sys
 import configparser
+import uuid
+import os
 
 # Load the config file
 config = configparser.ConfigParser()
@@ -320,6 +320,17 @@ def main():
     response = get_gpt_response(prompt)
     
     response = json.loads(response)
+    
+    # print the response to /sessions under a uuid
+    os.makedirs("sessions", exist_ok=True)
+    # only create a new file if the uuid does not exist, else append to the existing file
+    if not os.path.exists(f"sessions/{uuid.uuid4()}.json"):
+        with open(f"sessions/{uuid.uuid4()}.json", "w") as f:
+            json.dump(response, f, indent=4)
+    else:
+        with open(f"sessions/{uuid.uuid4()}.json", "a") as f:
+            json.dump(response, f, indent=4)
+    
     print(response["content"])
     
     # delete all .pyc files in the directory and subdirectories and __pycache__ folders
