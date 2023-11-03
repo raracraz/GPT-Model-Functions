@@ -7,7 +7,9 @@ from Function_List.Weather.getRealtimeWeather import getRealtimeWeather
 from Function_List.Weather.getForecastWeather import getForecastWeather
 
 from Function_List.Translation.Translation_detectLang import Translation_detectLang
-from Function_List.Translation.Translation_translateLang import Translation_translateLang
+from Function_List.Translation.Translation_translateLang import (
+    Translation_translateLang,
+)
 
 from Function_List.Internet.Internet_googleSearch import Internet_googleSearch
 
@@ -26,13 +28,14 @@ gpt_model = config["openai"]["gpt_model"]
 
 # Import the functions
 
+
 def load_api_key():
     """
     Loads the OpenAI API key from the config file.
-    
+
     Parameters:
     - None
-    
+
     Returns:
     - None
     """
@@ -43,6 +46,7 @@ def load_api_key():
         print("Error: Failed to load the API key.")
         print(f"Exception: {e}")
         sys.exit(1)
+
 
 def generate_message_template(role, content):
     """
@@ -95,11 +99,12 @@ def generate_function_template(name, description, parameters=None, required=None
 def get_gpt_response(prompt, messages=None):
     """
     This function takes in a prompt and returns the response from GPT-3.5
-    
+
     Parameters:
     - prompt (str): The prompt to feed into the GPT model
     - messages (list, optional): A list of messages to feed into the GPT model
-    
+    - session_uuid (str, optional): A UUID to identify the session
+
     Returns:
     - JSON: A JSON object representing the response from GPT-3.5
     """
@@ -257,24 +262,19 @@ def get_gpt_response(prompt, messages=None):
         # Step 3: call the function
         # Note: the JSON response may not always be valid; be sure to handle errors
         available_functions = {
-            
             # Finance
             "Finance_autoComplete": Finance_autoComplete,
             "getFinanceNews": getFinanceNews,
             "getStockPrice": getStockPrice,
-            
             # Weather
             "Weather_autoComplete": Weather_autoComplete,
             "getRealtimeWeather": getRealtimeWeather,
             "getForecastWeather": getForecastWeather,
-            
             # Translation
             "Translation_detectLang": Translation_detectLang,
             "Translation_translateLang": Translation_translateLang,
-            
             # Internet
             "Internet_googleSearch": Internet_googleSearch,
-            
         }  # only one function in this example, but you can have multiple
         function_name = response_message["function_call"]["name"]
         function_to_call = available_functions[function_name]
@@ -293,51 +293,75 @@ def get_gpt_response(prompt, messages=None):
                 "content": function_response,
             }
         )  # extend conversation with function response
-        
+
         second_response = openai.ChatCompletion.create(
             model=gpt_model,
             messages=messages,
             functions=functions,
             function_call="auto",
         )  # get a new response from GPT where it can see the function response
-        
+
         if response["choices"][0]["message"].get("function_call"):
             # if GPT still wants to call a function, repeat steps 2-4
             return get_gpt_response(prompt, messages)
-        
+
         return json.dumps(second_response["choices"][0]["message"], indent=4)
     else:
-        
         return json.dumps(response_message, indent=4)
 
-def main():
+
+def main(session_uuid=None):
     load_api_key()
+
+    if session_uuid == "":
+        session_uuid = uuid.uuid4()
+
+    # else use the session_uuid provided by the user to get the context from sessions/{session_uuid}.json
+    # if the file does not exist, create a new file with the session_uuid
+    # if os.path.isfile(f"sessions/{session_uuid}.json"):
+    #     with open(f"sessions/{session_uuid}.json", "r") as f:
+    #         context = json.load(f)
+    # else:
+    #     context = {}
+    
+    os.makedirs("sessions", exist_ok=True)
+    context = {}
+    if os.path.isfile(f"sessions/{session_uuid}.json"):
+        with open(f"sessions/{session_uuid}.json", "r") as f:
+            context = json.load(f)
+    else:
+        with open(f"sessions/{session_uuid}.json", "w") as f:
+            json.dump(context, f, indent=4)
+
     # use Internet prompt
-    internet_prompt = "use the Internet_googleSearch function to complete this request: "
+    internet_prompt = (
+        "use the Internet_googleSearch function to complete this request: "
+    )
     prompt = "what is the base price of shipping from US to SG using DHL for a 0.5kg package?"
     prompt = internet_prompt + prompt
     
-    response = get_gpt_response(prompt)
+    # append the context to the prompt
+    prompt = f"{prompt}\n\nContext: {context}"
     
+    response = get_gpt_response(prompt)
+
     response = json.loads(response)
     
-    # print the response to /sessions under a uuid
-    os.makedirs("sessions", exist_ok=True)
-    # only create a new file if the uuid does not exist, else append to the existing file
-    if not os.path.exists(f"sessions/{uuid.uuid4()}.json"):
-        with open(f"sessions/{uuid.uuid4()}.json", "w") as f:
-            json.dump(response, f, indent=4)
-    else:
-        with open(f"sessions/{uuid.uuid4()}.json", "a") as f:
-            json.dump(response, f, indent=4)
-    
+    # output the response to the session_uuid.json file
+    context = response["context"]
+    with open(f"sessions/{session_uuid}.json", "w") as f:
+        json.dump(context, f, indent=4)
+
     print(response["content"])
-    
+
     # delete all .pyc files in the directory and subdirectories and __pycache__ folders
     import glob
     import shutil
+
     for pyc_folder in glob.glob("**/__pycache__", recursive=True):
         shutil.rmtree(pyc_folder)
 
+
 if __name__ == "__main__":
-    main()
+    session_uuid = ""
+    main(session_uuid)
