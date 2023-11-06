@@ -316,14 +316,6 @@ def main(session_uuid=None):
     if session_uuid == "":
         session_uuid = uuid.uuid4()
 
-    # else use the session_uuid provided by the user to get the context from sessions/{session_uuid}.json
-    # if the file does not exist, create a new file with the session_uuid
-    # if os.path.isfile(f"sessions/{session_uuid}.json"):
-    #     with open(f"sessions/{session_uuid}.json", "r") as f:
-    #         context = json.load(f)
-    # else:
-    #     context = {}
-    
     os.makedirs("sessions", exist_ok=True)
     context = {}
     if os.path.isfile(f"sessions/{session_uuid}.json"):
@@ -337,7 +329,7 @@ def main(session_uuid=None):
     internet_prompt = (
         "use the Internet_googleSearch function to complete this request: "
     )
-    prompt = "how about for buyandship.com.sg?"
+    prompt = "what is the current stock price of Apple?"
     prompt = internet_prompt + prompt
     
     # append the context to the prompt

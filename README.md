@@ -9,5 +9,6 @@ This repository is currently a work in progress. More functionalities and improv
 
 ## Improvement Ideas
 - ✔️ Add Session Management
+- [ ] Add more functionality to the GPT model
 - [ ] Add a GUI (app/website)
 - [ ] Add a database to store user data (if needed)
